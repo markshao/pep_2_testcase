@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pep-2-testcase"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4>=4.14.3",
+    "deepagents>=0.3.6",
+    "langchain>=1.2.6",
+    "langchain-openai>=1.1.7",
+    "langgraph>=1.0.6",
+    "pydantic>=2.12.5",
+    "pytest>=9.0.2",
+    "python-dotenv>=1.2.1",
+    "requests>=2.32.5",
+]
+
+[project.scripts]
+pep2tc = "pep2testcase.cli.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pep2testcase"]
