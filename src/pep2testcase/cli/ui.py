@@ -157,5 +157,11 @@ class UIManager:
     def _render_logs(self) -> Panel:
         if not self.logs:
             return Panel("Waiting for activity...", title="Activity Log", border_style="cyan")
-            
-        return Panel(Group(*self.logs), title="Activity Log", border_style="cyan")
+        
+        # Only render the last 6 logs to ensure the latest are visible (simulating auto-scroll)
+        # Since we can't easily calculate height, this heuristic prevents overflow hiding new logs.
+        # Rich renders top-down, so if content exceeds height, the bottom (newest) logs get cut off.
+        # Keeping this number small is crucial.
+        visible_logs = self.logs[-6:]
+        
+        return Panel(Group(*visible_logs), title="Activity Log", border_style="cyan")
