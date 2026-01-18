@@ -158,10 +158,27 @@ class UIManager:
         if not self.logs:
             return Panel("Waiting for activity...", title="Activity Log", border_style="cyan")
         
-        # Only render the last 6 logs to ensure the latest are visible (simulating auto-scroll)
-        # Since we can't easily calculate height, this heuristic prevents overflow hiding new logs.
-        # Rich renders top-down, so if content exceeds height, the bottom (newest) logs get cut off.
-        # Keeping this number small is crucial.
-        visible_logs = self.logs[-6:]
+        # Strategy: Show the LATEST log fully, and collapse older logs into 1-line summaries.
+        # This ensures we always see the most recent activity without overflow issues.
         
-        return Panel(Group(*visible_logs), title="Activity Log", border_style="cyan")
+        rendered_logs = []
+        
+        # 1. Summarize older logs (show last 15 max, excluding the very last one)
+        # We take a slice to avoid overwhelming the screen with history
+        history_logs = self.logs[-16:-1] 
+        
+        for log_panel in history_logs:
+            # Extract title from Panel if possible, or use a default
+            title = getattr(log_panel, "title", "Log Entry")
+            # Create a simple text summary
+            rendered_logs.append(Text(f"• {title}", style="dim cyan"))
+            
+        # 2. Add a separator if there is history
+        if history_logs:
+             rendered_logs.append(Text("─" * 30, style="dim"))
+             
+        # 3. Show the latest log fully
+        latest_log = self.logs[-1]
+        rendered_logs.append(latest_log)
+        
+        return Panel(Group(*rendered_logs), title="Activity Log", border_style="cyan")
