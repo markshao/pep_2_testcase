@@ -76,6 +76,42 @@ class UIManager:
             self.sub_todos = todos
         self.update()
 
+    def mark_current_lead_task_completed(self):
+        """
+        Optimistically marks the current 'in_progress' lead task as 'completed'.
+        Used when a sub-agent finishes its work.
+        """
+        updated = False
+        for todo in self.main_todos:
+            if todo.get("status") == "in_progress":
+                todo["status"] = "completed"
+                updated = True
+                break
+        if updated:
+            self.update()
+
+    def mark_next_lead_task_in_progress(self):
+        """
+        Optimistically marks the first 'pending' lead task as 'in_progress' 
+        IF there is no current 'in_progress' task.
+        Used when Lead Agent delegates a task.
+        """
+        # 1. Check if there is already an in_progress task
+        for todo in self.main_todos:
+            if todo.get("status") == "in_progress":
+                return # Already working on something
+
+        # 2. If not, find the first pending and start it
+        updated = False
+        for todo in self.main_todos:
+            if todo.get("status") == "pending":
+                todo["status"] = "in_progress"
+                updated = True
+                break
+        
+        if updated:
+            self.update()
+
     def add_log(self, renderable):
         self.logs.append(renderable)
         if len(self.logs) > self.max_logs:

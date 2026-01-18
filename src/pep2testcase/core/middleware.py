@@ -39,6 +39,14 @@ class SimpleToolLoggerMiddleware(AgentMiddleware):
             if isinstance(msg, list) and len(msg) > 0:
                 msg = msg[0]
         
+        # Check for Sub-Agent Completion (No tools called)
+        # If a Sub-Agent finishes (returns text without tool calls), 
+        # we optimistically mark the current Lead Task as completed.
+        if self.ui and "Sub" in self.agent_name:
+            has_tools = msg and hasattr(msg, "tool_calls") and msg.tool_calls
+            if not has_tools:
+                self.ui.mark_current_lead_task_completed()
+        
         if msg and hasattr(msg, "tool_calls") and msg.tool_calls:
             # Reorder tool calls to process 'write_todos' FIRST.
             # This ensures the UI Plan is updated BEFORE we log the actual execution actions.
@@ -56,6 +64,9 @@ class SimpleToolLoggerMiddleware(AgentMiddleware):
                     self._handle_plan(args)
                 elif name == "task":
                     self._handle_subagent(args)
+                    # When Lead Agent delegates, optimistically start the next task
+                    if self.ui and "Lead" in self.agent_name:
+                        self.ui.mark_next_lead_task_in_progress()
                 else:
                     # Log all other tools generically
                     self._handle_tool(name, args) 
