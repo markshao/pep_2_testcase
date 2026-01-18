@@ -1,5 +1,5 @@
 from pep2testcase.core.graph import create_graph
-from pep2testcase.core.tools.fetcher import fetch_pep_content
+from pep2testcase.core.agents.tools.fetcher import fetch_pep_content
 
 def test_graph_construction():
     app = create_graph()

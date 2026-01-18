@@ -16,12 +16,24 @@ dependencies = [
     "langgraph>=1.0.6",
     "pydantic>=2.12.5",
     "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+    "pytest-mock>=3.15.1",
     "python-dotenv>=1.2.1",
     "requests>=2.32.5",
+    "requests-mock>=1.12.1",
+    "tavily-python>=0.7.19",
+    "rich>=13.7.0",
 ]
 
 [project.scripts]
 pep2tc = "pep2testcase.cli.main:main"
+pep2testcase = "pep2testcase.cli.main:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pep2testcase"]
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_date_format = "%Y-%m-%d %H:%M:%S"
