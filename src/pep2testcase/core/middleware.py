@@ -40,7 +40,15 @@ class SimpleToolLoggerMiddleware(AgentMiddleware):
                 msg = msg[0]
         
         if msg and hasattr(msg, "tool_calls") and msg.tool_calls:
-            for tc in msg.tool_calls:
+            # Reorder tool calls to process 'write_todos' FIRST.
+            # This ensures the UI Plan is updated BEFORE we log the actual execution actions.
+            # This fixes the race condition where logs show activity for a task that isn't yet marked 'in_progress'.
+            tool_calls = sorted(
+                msg.tool_calls, 
+                key=lambda x: 0 if x.get("name") == "write_todos" else 1
+            )
+            
+            for tc in tool_calls:
                 name = tc.get("name")
                 args = tc.get("args")
                 
